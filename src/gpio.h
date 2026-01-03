@@ -40,21 +40,25 @@ enum {
 #define PIN_PORT(pin) ((pin) >> 8)
 #define PIN_NUM(pin) (uint8_t)((pin) & 255)
 
-
+// Defines the input/output mode of the GPIO pin, with configuration for the type.
 static inline void gpio_set(uint16_t pin, uint8_t mode, uint8_t configuration) {
   struct gpio *gpio = GPIO(PIN_PORT(pin));
   uint8_t pin_num = PIN_NUM(pin);
 
+  // Pins 0-7
   if(pin_num < 8) {
     gpio->CRL &= ~(15U << (pin_num * 4));
     gpio->CRL |= (uint32_t)(((configuration << 2) | mode) << (pin_num * 4));
   }
+
+  // Pins 8-15
   else {
     gpio->CRH &= ~(15U << ((pin_num - 8) * 4));
     gpio->CRH |= (uint32_t)(((configuration << 2) | mode) << ((pin_num - 8) * 4));
   }
 }
 
+// For an output GPIO pin, sets the output.
 static inline void gpio_write(uint16_t pin, uint8_t state) {
   struct gpio *gpio = GPIO(PIN_PORT(pin));
   uint8_t pin_num = PIN_NUM(pin);
