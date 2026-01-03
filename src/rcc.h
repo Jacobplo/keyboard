@@ -1,5 +1,5 @@
-#ifndef BLUE_PILL_RCC_H
-#define BLUE_PILL_RCC_H
+#ifndef STM32F1XX_RCC_H
+#define STM32F1XX_RCC_H
 
 #include <stdint.h>
 

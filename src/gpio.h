@@ -1,6 +1,6 @@
-#ifndef BLUE_PILL_GPIO_H
+#ifndef STM32F1XX_GPIO_H
 
-#define BLUE_PILL_GPIO_H
+#define STM32F1XX_GPIO_H
 
 #include <stdint.h>
 
