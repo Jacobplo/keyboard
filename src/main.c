@@ -3,27 +3,24 @@
 #include "gpio.h"
 #include "rcc.h"
 
-//extern void Reset_Handler();
+
+static inline void wait(volatile uint32_t count) {
+  for(volatile uint32_t i = 0; i < count; i++) {
+    (void) 0;
+  }
+}
 
 int main(void) {
-  //for(char i = 'A'; i < 'H'; i++) {
-  //  RCC->APB2ENR |= ((1UL << 2) << (i - 'A'));
-  //  for(int j = 0; j < 16; j++) {
-  //    uint16_t led = PIN(i, j);
-  //    gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
-  //    gpio_write(led, GPIO_ON);
-  //  }
-  //  
-  //  
-  //}
   uint16_t led = PIN('B', 2);
   RCC->APB2ENR |= (1 << 3);
   gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
 
 
   for(;;) {
+    gpio_write(led, GPIO_ON);
+    wait(999999);
     gpio_write(led, GPIO_OFF);
-    (void) 0;
+    wait(999999);
   };
   return 0;
 }
