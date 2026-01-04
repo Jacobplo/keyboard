@@ -2,25 +2,24 @@
 
 #include "gpio.h"
 #include "rcc.h"
+#include "systick.h"
 
-
-static inline void wait(volatile uint32_t count) {
-  for(volatile uint32_t i = 0; i < count; i++) {
-    (void) 0;
-  }
-}
 
 int main(void) {
+  // Initialize systick with 1 ms = 1 tick
+  systick_init(9000000 / 1000);
+
+  
   uint16_t led = PIN('B', 2);
   RCC->APB2ENR |= (1 << 3);
   gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
 
 
-  for(;;) {
+  while(1) {
     gpio_write(led, GPIO_ON);
-    wait(999999);
+    delay_ticks(100);
     gpio_write(led, GPIO_OFF);
-    wait(999999);
+    delay_ticks(100);
   };
   return 0;
 }
@@ -39,5 +38,5 @@ __attribute__((naked, noreturn)) void _reset(void) {
 extern void _estack(void);
 
 __attribute__((section(".isr_vector"))) void (*const tab[16 + 91])(void) = {
-  _estack, _reset
+  _estack, _reset, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, SysTick_Handler
 };
