@@ -11,10 +11,10 @@ int main(void) {
 
   gpio_init();
 
-  
+ 
+
   uint16_t led = PIN('B', 2);
   gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
-
 
   while(1) {
     gpio_write(led, GPIO_ON);
@@ -25,6 +25,8 @@ int main(void) {
   return 0;
 }
 
+
+
 // Startup code
 __attribute__((naked, noreturn)) void _reset(void) {
   // memset .bss to zero, and copy .data section to RAM region
@@ -33,7 +35,7 @@ __attribute__((naked, noreturn)) void _reset(void) {
   for (long *dst = &_sdata, *src = &_sidata; dst < &_edata;) *dst++ = *src++;
 
   main();             // Call main()
-  for (;;) (void) 0;  // Infinite loop in the case if main() returns
+  while(1) (void) 0;  // Infinite loop in the case if main() returns
 }
 
 extern void _estack(void);
