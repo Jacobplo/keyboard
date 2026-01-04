@@ -9,9 +9,10 @@ int main(void) {
   // Initialize systick with 1 ms = 1 tick
   systick_init(9000000 / 1000);
 
+  gpio_init();
+
   
   uint16_t led = PIN('B', 2);
-  RCC->APB2ENR |= (1 << 3);
   gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
 
 

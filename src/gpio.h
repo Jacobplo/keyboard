@@ -3,6 +3,7 @@
 #define STM32F1XX_GPIO_H
 
 #include <stdint.h>
+#include "rcc.h"
 
 struct gpio {
   volatile uint32_t CRL, CRH, IDR, ODR, BSRR, BRR, LCKR;
@@ -64,6 +65,14 @@ static inline void gpio_write(uint16_t pin, uint8_t state) {
   uint8_t pin_num = PIN_NUM(pin);
 
   gpio->BSRR = (uint32_t)(1 << pin_num) << (state ? 0 : 16);
+}
+
+
+// Enable RCC clock for all GPIO ports.
+static inline void gpio_init() {
+  for(uint8_t i = 2; i < 9; i++) {
+    RCC->APB2ENR |= (1 << i);
+  }
 }
 
 
