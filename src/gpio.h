@@ -67,6 +67,14 @@ static inline void gpio_write(uint16_t pin, uint8_t state) {
   gpio->BSRR = (uint32_t)(1 << pin_num) << (state ? 0 : 16);
 }
 
+//For an input GPIO pin, reads the input.
+static inline uint8_t gpio_read(uint16_t pin) {
+  struct gpio *gpio = GPIO(PIN_PORT(pin));
+  uint8_t pin_num = PIN_NUM(pin);
+
+  return (uint8_t)(gpio->IDR & (1 << pin_num));
+}
+
 
 // Enable RCC clock for all GPIO ports.
 static inline void gpio_init() {
