@@ -36,7 +36,7 @@ enum {
   GPIO_HIGH
 };
 
-#define GPIO(port) ((struct gpio *) (0x40010800 + (0x400 * ((port) - 'A'))))
+#define GPIO(port) ((struct gpio *) (uintptr_t)(0x40010800 + (0x400 * ((port) - 'A'))))
 #define PIN(port, num) (((port) << 8) | (num)) // uint16_t
 #define PIN_PORT(pin) ((pin) >> 8)
 #define PIN_NUM(pin) (uint8_t)((pin) & 255)
