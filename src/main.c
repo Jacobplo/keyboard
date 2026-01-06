@@ -17,9 +17,9 @@ int main(void) {
   gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
 
   while(1) {
-    gpio_write(led, GPIO_ON);
+    gpio_write(led, GPIO_LOW);
     delay_ticks(100);
-    gpio_write(led, GPIO_OFF);
+    gpio_write(led, GPIO_HIGH);
     delay_ticks(100);
   };
   return 0;

@@ -32,8 +32,8 @@ enum {
 
 // GPIO State
 enum {
-  GPIO_OFF = 0,
-  GPIO_ON
+  GPIO_LOW = 0,
+  GPIO_HIGH
 };
 
 #define GPIO(port) ((struct gpio *) (0x40010800 + (0x400 * ((port) - 'A'))))
