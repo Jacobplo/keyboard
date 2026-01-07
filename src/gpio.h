@@ -77,7 +77,7 @@ static inline uint8_t gpio_read(uint16_t pin) {
 
 
 // Enable RCC clock for all GPIO ports.
-static inline void gpio_init() {
+static inline void gpio_init(void) {
   for(uint8_t i = 2; i < 9; i++) {
     RCC->APB2ENR |= (1 << i);
   }

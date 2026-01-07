@@ -15,7 +15,7 @@ struct usart {
 #define UART4  ((struct usart *) (0x40004C00))
 #define UART5  ((struct usart *) (0x40005000))
 
-static inline void usart_init() {
+static inline void usart_init(void) {
   // USART1
   RCC->APB2ENR |= (1 << 14);
 
