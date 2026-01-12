@@ -8,13 +8,13 @@ static inline void clock_init() {
   RCC->CR |= (1 << 0);
 
   // Set PLL clock source to HSI divided by 2 (4 MHz)
-  RCC->CFGR |= (1u << 16);
+  RCC->CFGR &= ~(1u << 16);
 
   // Multiple PLL by 12 (48 MHz)
   RCC->CFGR &= (0b1111u << 18);
   RCC->CFGR |= (0b1010 << 18);
 
-  // USB prescale PLL / 1.5 (48 MHz)
+  // USB prescale PLL no division (48 MHz)
   RCC->CFGR |= (1u << 22);
 
   // APB low speed prescaler of HCLK / 2 (24 MHz) [Cannot exceed this 36 MHz]
