@@ -8,6 +8,7 @@
 static inline void clock_init(void) {
   // Set 8 MHz HSI clock on
   RCC->CR |= (1 << 0);
+  while(!(RCC->CR & (1 << 1))) (void) 0;
 
   // Set PLL clock source to HSI divided by 2 (4 MHz)
   RCC->CFGR &= ~(1u << 16);
