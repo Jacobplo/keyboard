@@ -5,7 +5,7 @@
 
 #define SYSCLK_FREQ 48000000
 
-static inline void clock_init() {
+static inline void clock_init(void) {
   // Set 8 MHz HSI clock on
   RCC->CR |= (1 << 0);
 
