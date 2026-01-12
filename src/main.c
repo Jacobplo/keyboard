@@ -1,7 +1,6 @@
 #include <stdint.h>
 
 #include "gpio.h"
-#include "rcc.h"
 #include "systick.h"
 #include "clock.h"
 #include "usb.h"
