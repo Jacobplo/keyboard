@@ -3,6 +3,8 @@
 
 #include "rcc.h"
 
+#define SYSCLK_FREQ 48000000
+
 static inline void clock_init() {
   // Set 8 MHz HSI clock on
   RCC->CR |= (1 << 0);

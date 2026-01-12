@@ -12,7 +12,7 @@ int main(void) {
   usb_init();
 
   // Initialize systick with 1 ms = 1 tick
-  systick_init(48000000 / 1000);
+  systick_init(SYSCLK_FREQ / 1000);
 
   gpio_init();
 
