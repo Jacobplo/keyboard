@@ -3,15 +3,19 @@
 #include "gpio.h"
 #include "rcc.h"
 #include "systick.h"
+#include "clock.h"
+#include "usb.h"
 
 
 int main(void) {
+  clock_init();
+  usb_init();
+
   // Initialize systick with 1 ms = 1 tick
-  systick_init(9000000 / 1000);
+  systick_init(48000000 / 1000);
 
   gpio_init();
 
- 
 
   uint16_t led = PIN('B', 2);
   gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
