@@ -1,7 +1,9 @@
 #include <stdint.h>
 
-#include "gpio.h"
 #include "stm32f1xx.h"
+#include "stm32f103bluepillplus.h"
+
+#include "gpio.h"
 #include "systick.h"
 #include "clock.h"
 #include "usb.h"
@@ -13,10 +15,10 @@ void system_init(void);
 int main(void) {
   system_init();
 
-  uint16_t led = PIN('B', 2);
+  uint16_t led = PIN_LED;
   gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
 
-  uint16_t btn = PIN('A', 0);
+  uint16_t btn = PIN_BTN;
   gpio_set(btn, GPIO_INPUT, GPIO_IN_PULL_UP_DOWN);
 
 
