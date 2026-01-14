@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 
+#include "stm32f1xx.h"
 #include "rcc.h"
 
 struct usart {
@@ -17,12 +18,11 @@ struct usart {
 
 static inline void usart_init(void) {
   // USART1
-  RCC->APB2ENR |= (1 << 14);
+  RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
 
   // USART2-3, UART4-5
-  for(uint8_t i = 17; i < 21; i++) {
-    RCC->APB1ENR |= (1 << i);
-  }
+  RCC->APB1ENR |= RCC_APB1ENR_USART2EN | RCC_APB1ENR_USART3EN
+                | RCC_APB1ENR_UART4EN | RCC_APB1ENR_UART5EN;
 }
 
 #endif

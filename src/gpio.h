@@ -3,6 +3,8 @@
 #define STM32F1XX_GPIO_H
 
 #include <stdint.h>
+
+#include "stm32f1xx.h"
 #include "rcc.h"
 
 struct gpio {
@@ -39,7 +41,7 @@ enum {
 #define GPIO(port) ((struct gpio *) (uintptr_t)(0x40010800 + (0x400 * ((port) - 'A'))))
 #define PIN(port, num) (((port) << 8) | (num)) // uint16_t
 #define PIN_PORT(pin) ((pin) >> 8)
-#define PIN_NUM(pin) (uint8_t)((pin) & 255)
+#define PIN_NUM(pin) (uint8_t)((pin) & 255u)
 
 // Defines the input/output mode of the GPIO pin, with configuration for the type.
 static inline void gpio_set(uint16_t pin, uint8_t mode, uint8_t configuration) {
@@ -48,13 +50,13 @@ static inline void gpio_set(uint16_t pin, uint8_t mode, uint8_t configuration) {
 
   // Pins 0-7
   if(pin_num < 8) {
-    gpio->CRL &= ~(15U << (pin_num * 4));
+    gpio->CRL &= ~(15u << (pin_num * 4));
     gpio->CRL |= (uint32_t)(((configuration << 2) | mode) << (pin_num * 4));
   }
 
   // Pins 8-15
   else {
-    gpio->CRH &= ~(15U << ((pin_num - 8) * 4));
+    gpio->CRH &= ~(15u << ((pin_num - 8) * 4));
     gpio->CRH |= (uint32_t)(((configuration << 2) | mode) << ((pin_num - 8) * 4));
   }
 }
@@ -67,20 +69,19 @@ static inline void gpio_write(uint16_t pin, uint8_t state) {
   gpio->BSRR = (uint32_t)(1 << pin_num) << (state ? 0 : 16);
 }
 
-//For an input GPIO pin, reads the input.
+// For an input GPIO pin, reads the input.
 static inline uint8_t gpio_read(uint16_t pin) {
   struct gpio *gpio = GPIO(PIN_PORT(pin));
   uint8_t pin_num = PIN_NUM(pin);
 
-  return (uint8_t)(gpio->IDR & (1 << pin_num));
+  return (uint8_t)(gpio->IDR & (1u << pin_num));
 }
 
 
 // Enable RCC clock for all GPIO ports.
 static inline void gpio_init(void) {
-  for(uint8_t i = 2; i < 9; i++) {
-    RCC->APB2ENR |= (1 << i);
-  }
+  RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN
+                | RCC_APB2ENR_IOPDEN | RCC_APB2ENR_IOPEEN;
 }
 
 
