@@ -7,15 +7,11 @@
 #include "usb.h"
 
 
+void system_init(void);
+
+
 int main(void) {
-  clock_init();
-  usb_init();
-
-  // Initialize systick with 1 ms = 1 tick
-  systick_init(SYSCLK_FREQ / 1000);
-
-  gpio_init();
-
+  system_init();
 
   uint16_t led = PIN('B', 2);
   gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
@@ -37,6 +33,14 @@ int main(void) {
     }
   };
   return 0;
+}
+
+// Order of initialization is important here.
+void system_init(void) {
+  clock_init();
+  systick_init(SYSCLK_FREQ / 1000);
+  usb_init();
+  gpio_init();
 }
 
 
