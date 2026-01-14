@@ -77,6 +77,11 @@ static inline uint8_t gpio_read(uint16_t pin) {
   return (uint8_t)(gpio->IDR & (1u << pin_num));
 }
 
+static inline void gpio_toggle(uint16_t pin) {
+  uint8_t state = gpio_read(pin);
+  state ? gpio_write(pin, GPIO_LOW) : gpio_write(pin, GPIO_HIGH);
+}
+
 
 // Enable RCC clock for all GPIO ports.
 static inline void gpio_init(void) {

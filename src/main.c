@@ -25,9 +25,7 @@ int main(void) {
 
   while(1) {
     if(gpio_read(btn)) {
-      gpio_write(led, GPIO_LOW); 
-      delay_ticks(100);
-      gpio_write(led, GPIO_HIGH);
+      gpio_toggle(led);
       delay_ticks(100);
     }
     else {
