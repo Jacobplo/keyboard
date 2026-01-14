@@ -17,8 +17,8 @@ struct systick {
 
 static inline int8_t systick_init(uint32_t ticks) {
   // SYST_RVR holds a 24 bit value
-  if(ticks > 0xffffff) return -1;
-  SYST->RVR = ticks;
+  if((ticks - 1) > 0xffffff) return -1;
+  SYST->RVR = ticks - 1;
 
   SYST->CVR = SYST_CVR_RELOAD;
 
