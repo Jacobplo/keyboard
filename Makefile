@@ -5,6 +5,8 @@ CFLAGS  ?=  -W -Wall -Wextra -Werror -Wundef -Wshadow -Wdouble-promotion \
 LDFLAGS ?= -Tlink.ld -nostartfiles -nostdlib --specs nano.specs -lc -lgcc -Wl,--gc-sections -Wl,-Map=$@.map
 SOURCES = $(wildcard src/*.c)
 
+default: clean flash
+
 build: firmware.bin
 
 firmware.elf: $(SOURCES) link.ld
