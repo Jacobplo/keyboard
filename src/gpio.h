@@ -66,7 +66,7 @@ static inline void gpio_write(uint16_t pin, uint8_t state) {
   struct gpio *gpio = GPIO(PIN_PORT(pin));
   uint8_t pin_num = PIN_NUM(pin);
 
-  gpio->BSRR = (uint32_t)(1 << pin_num) << (state ? 0 : 16);
+  gpio->BSRR = (uint32_t)(1u << pin_num) << (state ? 0 : 16);
 }
 
 // For an input GPIO pin, reads the input.
