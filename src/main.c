@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include "gpio.h"
+#include "stm32f1xx.h"
 #include "systick.h"
 #include "clock.h"
 #include "usb.h"
@@ -21,6 +22,8 @@ int main(void) {
 
   uint16_t btn = PIN('A', 0);
   gpio_set(btn, GPIO_INPUT, GPIO_IN_PULL_UP_DOWN);
+
+
 
   while(1) {
     if(gpio_read(btn)) {
