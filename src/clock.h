@@ -18,7 +18,7 @@ static inline void clock_init(void) {
   FLASH->ACR |= FLASH_ACR_LATENCY_2;
 
   // Set PLL clock source to HSE (8 MHz)
-  RCC->CFGR = (RCC_CFGR_PLLSRC);
+  RCC->CFGR |= RCC_CFGR_PLLSRC;
 
   // Multiply PLL by 9 (72 MHz)
   RCC->CFGR &= ~(RCC_CFGR_PLLMUL_16);
