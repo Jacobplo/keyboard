@@ -8,8 +8,10 @@ SOURCES = $(wildcard src/*.c)
 INCLUDE = -Ilib/cmsis-device-f1/Include -Ilib/CMSIS_5/CMSIS/Core/Include
 DEFINE  = -DSTM32F103xB
 
-default: clean flash
+.PHONY: default
+default: flash
 
+.PHONY: build
 build: firmware.bin
 
 firmware.elf: $(SOURCES) link.ld
@@ -18,8 +20,10 @@ firmware.elf: $(SOURCES) link.ld
 firmware.bin: firmware.elf
 	arm-none-eabi-objcopy -O binary $< $@
 
+.PHONY: flash
 flash: firmware.bin
 	st-flash --reset write $< 0x8000000
 
+.PHONY: clean
 clean:
 	rm -f firmware.*
