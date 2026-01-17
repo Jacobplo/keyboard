@@ -1,9 +1,7 @@
 #ifndef STM32F1XX_USB_H
 #define STM32F1XX_USB_H
 
-#include "stm32f1xx.h"
-#include "rcc.h"
-#include "gpio.h"
+#include "stm32f103xb.h"
 
 static inline void usb_init(void) {
   // Enable USB clock. Clock must be initialized properly first.

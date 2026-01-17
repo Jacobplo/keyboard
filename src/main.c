@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-#include "stm32f1xx.h"
+#include "stm32f103xb.h"
 #include "stm32f103bluepillplus.h"
 
 #include "gpio.h"
@@ -38,7 +38,7 @@ int main(void) {
 // Order of initialization is important here.
 void system_init(void) {
   clock_init();
-  systick_init(SYSCLK_FREQ / 1000);
+  SysTick_Config(SYSCLK_FREQ / 1000);
   usb_init();
   gpio_init();
 }

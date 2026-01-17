@@ -4,12 +4,7 @@
 
 #include <stdint.h>
 
-#include "stm32f1xx.h"
-#include "rcc.h"
-
-struct gpio {
-  volatile uint32_t CRL, CRH, IDR, ODR, BSRR, BRR, LCKR;
-};
+#include "stm32f103xb.h"
 
 // GPIO pin mode
 enum {
@@ -38,14 +33,14 @@ enum {
   GPIO_HIGH
 };
 
-#define GPIO(port) ((struct gpio *) (uintptr_t)(0x40010800 + (0x400 * ((port) - 'A'))))
+#define GPIO(port) ((GPIO_TypeDef *) (GPIOA_BASE + (uintptr_t)(0x400 * ((port) - 'A'))))
 #define PIN(port, num) (((port) << 8) | (num)) // uint16_t
 #define PIN_PORT(pin) ((pin) >> 8)
 #define PIN_NUM(pin) (uint8_t)((pin) & 255u)
 
 // Defines the input/output mode of the GPIO pin, with configuration for the type.
 static inline void gpio_set(uint16_t pin, uint8_t mode, uint8_t configuration) {
-  struct gpio *gpio = GPIO(PIN_PORT(pin));
+  GPIO_TypeDef *gpio = GPIO(PIN_PORT(pin));
   uint8_t pin_num = PIN_NUM(pin);
 
   // Pins 0-7
@@ -63,7 +58,7 @@ static inline void gpio_set(uint16_t pin, uint8_t mode, uint8_t configuration) {
 
 // For an output GPIO pin, sets the output.
 static inline void gpio_write(uint16_t pin, uint8_t state) {
-  struct gpio *gpio = GPIO(PIN_PORT(pin));
+  GPIO_TypeDef *gpio = GPIO(PIN_PORT(pin));
   uint8_t pin_num = PIN_NUM(pin);
 
   gpio->BSRR = (uint32_t)(1u << pin_num) << (state ? 0 : 16);
@@ -71,7 +66,7 @@ static inline void gpio_write(uint16_t pin, uint8_t state) {
 
 // For an input GPIO pin, reads the input.
 static inline uint8_t gpio_read(uint16_t pin) {
-  struct gpio *gpio = GPIO(PIN_PORT(pin));
+  GPIO_TypeDef *gpio = GPIO(PIN_PORT(pin));
   uint8_t pin_num = PIN_NUM(pin);
 
   return (uint8_t)(gpio->IDR & (1u << pin_num));
