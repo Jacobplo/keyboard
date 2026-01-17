@@ -91,14 +91,15 @@ uint8_t const desc_hid_mouse_report[] = {TUD_HID_REPORT_DESC_MOUSE()};
 // Application return pointer to descriptor
 // Descriptor contents must exist long enough for transfer to complete
 uint8_t const *tud_hid_descriptor_report_cb(uint8_t instance) {
-  return (instance == 0) ? desc_hid_keyboard_report : desc_hid_mouse_report;
+  (void) instance;
+  return desc_hid_keyboard_report;
 }
 
 //--------------------------------------------------------------------+
 // Configuration Descriptor
 //--------------------------------------------------------------------+
 
-#define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + 2 * TUD_HID_DESC_LEN)
+#define CONFIG_TOTAL_LEN (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN)
 
 #if CFG_TUSB_MCU == OPT_MCU_LPC175X_6X || CFG_TUSB_MCU == OPT_MCU_LPC177X_8X || CFG_TUSB_MCU == OPT_MCU_LPC40XX
 // LPC 17xx and 40xx endpoint type (bulk/interrupt/iso) are fixed by its number
@@ -112,17 +113,13 @@ uint8_t const *tud_hid_descriptor_report_cb(uint8_t instance) {
 
 uint8_t const desc_configuration[] = {
   // Config number, interface count, string index, total length, attribute, power in mA
-  TUD_CONFIG_DESCRIPTOR(1, ITF_NUM_TOTAL, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
+  TUD_CONFIG_DESCRIPTOR(1, 1, 0, CONFIG_TOTAL_LEN, TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, 100),
 
   // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
   TUD_HID_DESCRIPTOR(
       ITF_NUM_KEYBOARD, 0, HID_ITF_PROTOCOL_KEYBOARD, sizeof(desc_hid_keyboard_report), EPNUM_KEYBOARD,
-      CFG_TUD_HID_EP_BUFSIZE, 10),
-
-  // Interface number, string index, protocol, report descriptor len, EP In address, size & polling interval
-  TUD_HID_DESCRIPTOR(
-      ITF_NUM_MOUSE, 0, HID_ITF_PROTOCOL_MOUSE, sizeof(desc_hid_mouse_report), EPNUM_MOUSE, CFG_TUD_HID_EP_BUFSIZE,
-      10)};
+      CFG_TUD_HID_EP_BUFSIZE, 10)
+};
 
 // Invoked when received GET CONFIGURATION DESCRIPTOR
 // Application return pointer to descriptor
