@@ -1,11 +1,14 @@
 CFLAGS  ?=  -W -Wall -Wextra -Werror -Wundef -Wshadow -Wdouble-promotion \
-            -Wformat-truncation -fno-common -Wconversion \
+            -Wformat-truncation -fno-common \
             -g3 -Os -ffunction-sections -fdata-sections -I. \
             -mcpu=cortex-m3 -mthumb -MMD -MP
 LDFLAGS ?= -Tlink.ld --specs=nano.specs -lc -lgcc -Wl,--gc-sections -Wl,-Map=$@.map
 
-SOURCES = $(wildcard src/*.c)
-INCLUDE = -Ilib/cmsis-device-f1/Include -Ilib/CMSIS_5/CMSIS/Core/Include
+SOURCES = $(wildcard src/*.c) $(wildcard lib/tinyusb/src/*.c) $(wildcard lib/tinyusb/src/portable/st/stm32_fsdev/fsdev_common.c) \
+					$(wildcard lib/tinyusb/src/portable/st/stm32_fsdev/dcd_stm32_fsdev.c) $(wildcard lib/tinyusb/src/device/*.c) \
+					$(wildcard lib/tinyusb/src/class/hid/hid_device.c) $(wildcard lib/tinyusb/src/common/*.c)
+INCLUDE = -Isrc/ -Ilib/cmsis-device-f1/Include -Ilib/CMSIS_5/CMSIS/Core/Include -Ilib/tinyusb/src \
+					-Ilib/tinyusb/src/portable/st/stm32_fsdev -Ilib/tinyusb/src/device -Ilib/tinyusb/src/class/hid
 DEFINE  = -DSTM32F103xB
 
 BUILD_DIR := build
