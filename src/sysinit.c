@@ -1,11 +1,10 @@
-#ifndef STM32F1XX_CLOCK_H
-#define STM32F1XX_CLOCK_H
-
 #include "stm32f103xb.h"
+#include "system_stm32f1xx.h"
 
-#define SYSCLK_FREQ 72000000
+uint32_t SystemCoreClock;
 
-static inline void clock_init(void) {
+// Called automatically by startup code.
+void SystemInit(void) {
   // Set 8 MHz HSE clock on.
   RCC->CR |= RCC_CR_HSEON;
   while(!(RCC->CR & RCC_CR_HSERDY)) (void) 0;
@@ -38,5 +37,7 @@ static inline void clock_init(void) {
   RCC->CFGR |= (RCC_CFGR_SW_PLL);
 }
 
-#endif
 
+void SystemCoreClockUpdate(void) {
+  SystemCoreClock = 72000000;
+}
