@@ -7,6 +7,7 @@
 #include "gpio.h"
 #include "systick.h"
 #include "usb.h"
+#include "tusb.h"
 
 
 
@@ -14,6 +15,13 @@ int main(void) {
   systick_init();
   gpio_init();
   usb_init();
+
+  tusb_rhport_init_t dev_init = {
+    .role = TUSB_ROLE_DEVICE,
+    .speed = TUSB_SPEED_FULL
+  };
+  tusb_init(BOARD_TUD_RHPORT, &dev_init);
+
 
   uint16_t led = PIN_LED;
   gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
@@ -24,13 +32,7 @@ int main(void) {
 
 
   while(1) {
-    if(gpio_read(btn)) {
-      gpio_toggle(led);
-      delay_ticks(100);
-    }
-    else {
-      gpio_write(led, GPIO_LOW);
-    }
+    tud_task();
   };
   return 0;
 }
