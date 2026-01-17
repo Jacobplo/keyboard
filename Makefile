@@ -12,8 +12,8 @@ BUILD_DIR := build
 OBJ_DIR := $(BUILD_DIR)/obj
 DEP_DIR := $(BUILD_DIR)/deps
 
-OBJ  := $(patsubst src/%.c,$(OBJ_DIR)/%.o,$(SOURCES))
-DEPS := $(patsubst src/%.c,$(DEP_DIR)/%.d,$(SOURCES))
+OBJ  := $(SOURCES:%.c=$(OBJ_DIR)/%.o)
+DEPS := $(SOURCES:%.c=$(DEP_DIR)/%.d)
 
 
 .PHONY: default
@@ -24,8 +24,8 @@ default: build
 
 
 # Build object files and dependency files (.o and .d)
-$(OBJ_DIR)/%.o: src/%.c
-	mkdir -p $(OBJ_DIR) $(DEP_DIR)
+$(OBJ_DIR)/%.o: %.c
+	mkdir -p $(dir $@) $(dir $(DEP_DIR)/$*)
 	arm-none-eabi-gcc $(CFLAGS) $(INCLUDE) $(DEFINE) -c $< -o $@ -MF $(DEP_DIR)/$*.d
 
 $(OBJ_DIR)/startup.o:startup.s
