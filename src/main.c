@@ -9,12 +9,10 @@
 #include "usb.h"
 
 
-void system_init(void);
+void SystemInit(void);
 
 
 int main(void) {
-  system_init();
-
   uint16_t led = PIN_LED;
   gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL);
 
@@ -36,28 +34,9 @@ int main(void) {
 }
 
 // Order of initialization is important here.
-void system_init(void) {
+void SystemInit(void) {
   clock_init();
   SysTick_Config(SYSCLK_FREQ / 1000);
   usb_init();
   gpio_init();
 }
-
-
-
-// Startup code
-__attribute__((naked, noreturn)) void _reset(void) {
-  // memset .bss to zero, and copy .data section to RAM region
-  extern long _sbss, _ebss, _sdata, _edata, _sidata;
-  for (long *dst = &_sbss; dst < &_ebss; dst++) *dst = 0;
-  for (long *dst = &_sdata, *src = &_sidata; dst < &_edata;) *dst++ = *src++;
-
-  main();             // Call main()
-  while(1) (void) 0;  // Infinite loop in the case if main() returns
-}
-
-extern void _estack(void);
-
-__attribute__((section(".isr_vector"))) void (*const tab[16 + 91])(void) = {
-  _estack, _reset, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, SysTick_Handler
-};
