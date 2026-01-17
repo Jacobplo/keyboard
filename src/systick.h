@@ -4,8 +4,12 @@
 #include <stdint.h>
 
 #include "stm32f103xb.h"
+#include "system_stm32f1xx.h"
 
-void SysTick_Handler(void);
+static inline void systick_init(void) {
+  SystemCoreClockUpdate();
+  SysTick_Config(SystemCoreClock / 1000);
+}
 
 void delay_ticks(uint32_t ticks);
 
