@@ -9,31 +9,38 @@ INCLUDE = -Ilib/cmsis-device-f1/Include -Ilib/CMSIS_5/CMSIS/Core/Include
 DEFINE  = -DSTM32F103xB
 
 BUILD_DIR := build
-OBJ := $(patsubst src/%.c,$(BUILD_DIR)/%.o,$(SOURCES))
+OBJ_DIR := $(BUILD_DIR)/obj
+DEP_DIR := $(BUILD_DIR)/deps
+
+OBJ  := $(patsubst src/%.c,$(OBJ_DIR)/%.o,$(SOURCES))
+DEPS := $(patsubst src/%.c,$(DEP_DIR)/%.d,$(SOURCES))
 
 
 .PHONY: default
 default: build
 
+# Include dependency files if they exist
+-include $(DEPS)
 
--include $(OBJ:.o=.d)
 
+# Build object files and dependency files (.o and .d)
+$(OBJ_DIR)/%.o: src/%.c
+	mkdir -p $(OBJ_DIR) $(DEP_DIR)
+	arm-none-eabi-gcc $(CFLAGS) $(INCLUDE) $(DEFINE) -c $< -o $@ -MF $(DEP_DIR)/$*.d
 
-# Files
-$(BUILD_DIR)/%.o: src/%.c
-	arm-none-eabi-gcc $(CFLAGS) $(INCLUDE) $(DEFINE) -c $< -o $@
-
-$(BUILD_DIR)/startup.o:startup.s
+$(OBJ_DIR)/startup.o:startup.s
+	mkdir -p $(OBJ_DIR)
 	arm-none-eabi-gcc $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/firmware.elf: $(OBJ) $(BUILD_DIR)/startup.o link.ld
-	arm-none-eabi-gcc $(OBJ) $(BUILD_DIR)/startup.o $(CFLAGS) $(LDFLAGS) $(INCLUDE) $(DEFINE) -o $@
+
+# Build flashable firmware
+$(BUILD_DIR)/firmware.elf: $(OBJ) $(OBJ_DIR)/startup.o link.ld
+	arm-none-eabi-gcc $(OBJ) $(OBJ_DIR)/startup.o $(CFLAGS) $(LDFLAGS) $(INCLUDE) $(DEFINE) -o $@
 
 $(BUILD_DIR)/firmware.bin: $(BUILD_DIR)/firmware.elf
 	arm-none-eabi-objcopy -O binary $< $@
 
 
-# PHONYs
 .PHONY: build
 build: $(BUILD_DIR)/firmware.bin
 
@@ -41,7 +48,6 @@ build: $(BUILD_DIR)/firmware.bin
 flash: $(BUILD_DIR)/firmware.bin
 	st-flash --reset write $(BUILD_DIR)/firmware.bin 0x8000000
 
-
 .PHONY: clean
 clean:
-	rm -rf $(BUILD_DIR)/*
+	rm -rf $(BUILD_DIR)
