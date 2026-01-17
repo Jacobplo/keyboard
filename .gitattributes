@@ -1,0 +1,3 @@
+startup.s           linguist-vendored
+link.ld             linguist-vendored
+lib/**              linguist-vendored
