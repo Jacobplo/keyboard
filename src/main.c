@@ -13,6 +13,8 @@
 #include "hid.h"
 
 
+#define DEBUG 0
+
 
 static uint16_t led = PIN_LED;
 static uint16_t btn = PIN_BTN;
@@ -48,14 +50,15 @@ int main(void) {
 
   while(1) {
     tud_task();
+    #if DEBUG
     led_blinking_task();
-
+    #endif
     hid_task();
   };
   return 0;
 }
 
-
+#if DEBUG
 // Invoked when device is mounted
 void tud_mount_cb(void) {
   blink_interval_ms = BLINK_MOUNTED;
@@ -78,6 +81,7 @@ void tud_suspend_cb(bool remote_wakeup_en) {
 void tud_resume_cb(void) {
   blink_interval_ms = tud_mounted() ? BLINK_MOUNTED : BLINK_NOT_MOUNTED;
 }
+#endif
 
 //--------------------------------------------------------------------+
 // USB HID
@@ -101,14 +105,15 @@ void hid_task(void) {
     // Wake up host if we are in suspend mode
     // and REMOTE_WAKEUP feature is enabled by host
     tud_remote_wakeup();
-  } else {
+  } 
+  else {
     // keyboard interface
     if (tud_hid_n_ready(ITF_NUM_KEYBOARD)) {
       // used to avoid send multiple consecutive zero report for keyboard
       static bool has_keyboard_key = false;
 
-      uint8_t const report_id = 0;
-      uint8_t const modifier  = 0;
+      uint8_t const report_id = 0; // only one hid interface, so can be left as 0
+      uint8_t const modifier = 0; // bitmask of modifier keys
 
       if (btn2) {
         uint8_t keycode[6] = {0};
@@ -116,10 +121,11 @@ void hid_task(void) {
 
         tud_hid_n_keyboard_report(ITF_NUM_KEYBOARD, report_id, modifier, keycode);
         has_keyboard_key = true;
-      } else {
+      } 
+      else {
         // send empty key report if previously has key pressed
         if (has_keyboard_key) {
-          tud_hid_n_keyboard_report(ITF_NUM_KEYBOARD, report_id, modifier, NULL);
+          tud_hid_n_keyboard_report(ITF_NUM_KEYBOARD, report_id, 0, NULL);
         }
         has_keyboard_key = false;
       }
