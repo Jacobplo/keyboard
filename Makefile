@@ -21,7 +21,7 @@ DEPS := $(SOURCES:%.c=$(DEP_DIR)/%.d)
 
 
 .PHONY: default
-default: build
+all: build
 
 # Include dependency files if they exist
 -include $(DEPS)
@@ -29,20 +29,24 @@ default: build
 
 # Build object files and dependency files (.o and .d)
 $(OBJ_DIR)/%.o: %.c
-	mkdir -p $(dir $@) $(dir $(DEP_DIR)/$*)
-	arm-none-eabi-gcc $(CFLAGS) $(INCLUDE) $(DEFINE) -c $< -o $@ -MF $(DEP_DIR)/$*.d
+	@printf '\tCC\t%s\n' $<
+	@mkdir -p $(dir $@) $(dir $(DEP_DIR)/$*)
+	@arm-none-eabi-gcc $(CFLAGS) $(INCLUDE) $(DEFINE) -c $< -o $@ -MF $(DEP_DIR)/$*.d
 
 $(OBJ_DIR)/startup.o:startup.s
-	mkdir -p $(OBJ_DIR)
-	arm-none-eabi-gcc $(CFLAGS) -c $< -o $@
+	@printf '\tCC\t%s\n' $<
+	@mkdir -p $(OBJ_DIR)
+	@arm-none-eabi-gcc $(CFLAGS) -c $< -o $@
 
 
 # Build flashable firmware
 $(BUILD_DIR)/firmware.elf: $(OBJ) $(OBJ_DIR)/startup.o link.ld
-	arm-none-eabi-gcc $(OBJ) $(OBJ_DIR)/startup.o $(CFLAGS) $(LDFLAGS) $(INCLUDE) $(DEFINE) -o $@
+	@printf '\tLD\t%s\n' $@
+	@arm-none-eabi-gcc $(OBJ) $(OBJ_DIR)/startup.o $(CFLAGS) $(LDFLAGS) $(INCLUDE) $(DEFINE) -o $@
 
 $(BUILD_DIR)/firmware.bin: $(BUILD_DIR)/firmware.elf
-	arm-none-eabi-objcopy -O binary $< $@
+	@printf '\tOBJCPY\t%s\n' $@
+	@arm-none-eabi-objcopy -O binary $< $@
 
 
 .PHONY: build
@@ -50,6 +54,7 @@ build: $(BUILD_DIR)/firmware.bin
 
 .PHONY: flash
 flash: $(BUILD_DIR)/firmware.bin
+	@printf '\tFLASH\n'
 	st-flash --reset write $(BUILD_DIR)/firmware.bin 0x8000000
 
 .PHONY: clean
