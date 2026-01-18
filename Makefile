@@ -8,7 +8,7 @@ SOURCES = $(wildcard src/*.c) $(wildcard src/tinyusb/*.c) $(wildcard lib/tinyusb
 					$(wildcard lib/tinyusb/src/portable/st/stm32_fsdev/fsdev_common.c) \
 					$(wildcard lib/tinyusb/src/portable/st/stm32_fsdev/dcd_stm32_fsdev.c) $(wildcard lib/tinyusb/src/device/*.c) \
 					$(wildcard lib/tinyusb/src/class/hid/hid_device.c) $(wildcard lib/tinyusb/src/common/*.c)
-INCLUDE = -Isrc/ -Ilib/cmsis-device-f1/Include -Ilib/CMSIS_5/CMSIS/Core/Include -Isrc/tinyusb -Ilib/tinyusb/src \
+INCLUDE = -Iinc/ -Ilib/cmsis-device-f1/Include -Ilib/CMSIS_5/CMSIS/Core/Include -Iinc/tinyusb -Ilib/tinyusb/src \
 					-Ilib/tinyusb/src/portable/st/stm32_fsdev -Ilib/tinyusb/src/device -Ilib/tinyusb/src/class/hid
 DEFINE  = -DSTM32F103xB
 
