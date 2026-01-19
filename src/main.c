@@ -5,6 +5,7 @@
 #include "stm32f103bluepillplus.h"
 
 #include "gpio.h"
+#include "afio.h"
 #include "systick.h"
 #include "usb.h"
 
@@ -19,6 +20,16 @@
 static uint16_t led = PIN_LED;
 static uint16_t btn = PIN_BTN;
 
+#define NUM_ROWS 2
+#define NUM_COLS 4
+
+static uint16_t row[NUM_ROWS] = { PIN('B', 11), PIN('B', 10) };
+static uint16_t col[NUM_COLS] = { PIN('B', 3), PIN('B', 4), PIN('B', 5), PIN('B', 6) };
+
+static uint8_t keys[NUM_ROWS][NUM_COLS] = {
+  { HID_KEY_1, HID_KEY_2, HID_KEY_3, HID_KEY_4 },
+  { HID_KEY_A, HID_KEY_B, HID_KEY_C, HID_KEY_D }
+};
 
 enum {
   BLINK_NOT_MOUNTED = 250,
@@ -30,29 +41,53 @@ static uint32_t blink_interval_ms = BLINK_NOT_MOUNTED;
 void led_blinking_task(void);
 void hid_task(void);
 
+void select_row(uint8_t row_num) {
+  gpio_write(row[row_num], GPIO_LOW);
+  for(int8_t i = 0; i < NUM_ROWS; i++) {
+    if(i == row_num) continue;
+    
+    gpio_write(row[i], GPIO_HIGH);
+  }
+}
 
 
 int main(void) {
   systick_init();
+  afio_init();
+  afio_disable_jtag();
   gpio_init();
   usb_init();
 
+  // On-board peripheral initialization
+  gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL); 
+  gpio_set(btn, GPIO_INPUT, GPIO_IN_PULL_UP_DOWN);
+
+
+  // Keyboard Matrix Initialization
+  for(int8_t i = 0; i < 2; i++) {
+    gpio_set(row[i], GPIO_OUTPUT_50MHZ, GPIO_OUT_OPEN_DRAIN);
+    gpio_write(row[i], GPIO_HIGH);
+  }
+  for(int8_t i = 0; i < 4; i++) {
+    gpio_set(col[i], GPIO_INPUT, GPIO_IN_PULL_UP_DOWN);
+  }
+
+ // Tusb initialization.
   tusb_rhport_init_t dev_init = {
     .role = TUSB_ROLE_DEVICE,
     .speed = TUSB_SPEED_FULL
   };
   tusb_init(BOARD_TUD_RHPORT, &dev_init);
-
-  
-  gpio_set(led, GPIO_OUTPUT_10MHZ, GPIO_OUT_PUSH_PULL); 
-  gpio_set(btn, GPIO_INPUT, GPIO_IN_PULL_UP_DOWN);
+ 
 
 
+  // Main loop
   while(1) {
     tud_task();
     #if DEBUG
     led_blinking_task();
     #endif
+    
     hid_task();
   };
   return 0;
@@ -109,38 +144,38 @@ void hid_task(void) {
   else {
     // keyboard interface
     if (tud_hid_n_ready(ITF_NUM_KEYBOARD)) {
-      // used to avoid send multiple consecutive zero report for keyboard
-      static bool has_keyboard_key = false;
+      static bool key_pressed = false;
+      static bool nothing_pressed = true;
+      uint8_t const report_id = 0;  // only one hid interface, so can be left as 0
+      uint8_t const modifier = 0;   // bitmask of modifier keys
+      uint8_t keycode[6] = {0};     // 6 keys can be pressed at once
+      
+      uint8_t key_index = 0;
 
-      uint8_t const report_id = 0; // only one hid interface, so can be left as 0
-      uint8_t const modifier = 0; // bitmask of modifier keys
-
-      if (btn2) {
-        uint8_t keycode[6] = {0};
-        keycode[0]         = HID_KEY_A;
-
-        tud_hid_n_keyboard_report(ITF_NUM_KEYBOARD, report_id, modifier, keycode);
-        has_keyboard_key = true;
-      } 
-      else {
-        // send empty key report if previously has key pressed
-        if (has_keyboard_key) {
-          tud_hid_n_keyboard_report(ITF_NUM_KEYBOARD, report_id, 0, NULL);
+      for(int8_t i = 0; i < NUM_ROWS; i++) {
+        select_row(i);
+        delay_ticks(1);
+        for(int8_t j = 0; j < NUM_COLS; j++) {
+          if(key_index == 6) {
+            break;
+          }
+          if(!gpio_read(col[j])) {
+            keycode[key_index] = keys[i][j];
+            key_index++; 
+            key_pressed = true;
+            nothing_pressed = false;
+          }
         }
-        has_keyboard_key = false;
       }
-    }
-
-    // mouse interface
-    if (tud_hid_n_ready(ITF_NUM_MOUSE)) {
-      if (btn) {
-        uint8_t const report_id   = 0;
-        uint8_t const button_mask = 0;
-        int8_t const  vertical    = 0;
-        int8_t const  horizontal  = 0;
-        int8_t const  delta       = 5;
-
-        tud_hid_n_mouse_report(ITF_NUM_MOUSE, report_id, button_mask, delta, delta, vertical, horizontal);
+      
+      if(key_pressed) { 
+        tud_hid_n_keyboard_report(ITF_NUM_KEYBOARD, report_id, modifier, keycode);
+        key_pressed = false;
+        nothing_pressed = true;
+      }
+      else if(nothing_pressed) {
+        tud_hid_n_keyboard_report(ITF_NUM_KEYBOARD, report_id, 0, NULL);
+        nothing_pressed = false;
       }
     }
   }
