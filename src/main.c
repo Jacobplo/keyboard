@@ -27,8 +27,8 @@ static uint16_t row[NUM_ROWS] = { PIN('B', 11), PIN('B', 10) };
 static uint16_t col[NUM_COLS] = { PIN('B', 3), PIN('B', 4), PIN('B', 5), PIN('B', 6) };
 
 static uint8_t keys[NUM_ROWS][NUM_COLS] = {
-  { HID_KEY_1, HID_KEY_2, HID_KEY_3, HID_KEY_4 },
-  { HID_KEY_A, HID_KEY_B, HID_KEY_C, HID_KEY_D }
+  { HID_KEY_ESCAPE, HID_KEY_SLASH, HID_KEY_W, HID_KEY_E },
+  { HID_KEY_SPACE, HID_KEY_A, HID_KEY_S, HID_KEY_D }
 };
 
 enum {
@@ -42,12 +42,11 @@ void led_blinking_task(void);
 void hid_task(void);
 
 void select_row(uint8_t row_num) {
+  // Reset previous row to floating
+  gpio_write(row[(row_num - 1 + NUM_ROWS) % NUM_ROWS], GPIO_HIGH);
+
+  // Set selected row to HIGH
   gpio_write(row[row_num], GPIO_LOW);
-  for(int8_t i = 0; i < NUM_ROWS; i++) {
-    if(i == row_num) continue;
-    
-    gpio_write(row[i], GPIO_HIGH);
-  }
 }
 
 
@@ -64,11 +63,11 @@ int main(void) {
 
 
   // Keyboard Matrix Initialization
-  for(int8_t i = 0; i < 2; i++) {
+  for(int8_t i = 0; i < NUM_ROWS; i++) {
     gpio_set(row[i], GPIO_OUTPUT_50MHZ, GPIO_OUT_OPEN_DRAIN);
     gpio_write(row[i], GPIO_HIGH);
   }
-  for(int8_t i = 0; i < 4; i++) {
+  for(int8_t i = 0; i < NUM_ROWS; i++) {
     gpio_set(col[i], GPIO_INPUT, GPIO_IN_PULL_UP_DOWN);
   }
 
@@ -84,6 +83,7 @@ int main(void) {
   // Main loop
   while(1) {
     tud_task();
+
     #if DEBUG
     led_blinking_task();
     #endif
