@@ -144,8 +144,8 @@ void hid_task(void) {
   else {
     // keyboard interface
     if (tud_hid_n_ready(ITF_NUM_KEYBOARD)) {
-      static bool key_pressed = false;
-      static bool nothing_pressed = true;
+      static bool send_keys_pressed = false;
+      static bool send_keys_lifted = true;
       uint8_t const report_id = 0;  // only one hid interface, so can be left as 0
       uint8_t const modifier = 0;   // bitmask of modifier keys
       uint8_t keycode[6] = {0};     // 6 keys can be pressed at once
@@ -162,20 +162,20 @@ void hid_task(void) {
           if(!gpio_read(col[j])) {
             keycode[key_index] = keys[i][j];
             key_index++; 
-            key_pressed = true;
-            nothing_pressed = false;
+            send_keys_pressed = true;
+            send_keys_lifted = false;
           }
         }
       }
       
-      if(key_pressed) { 
+      if(send_keys_pressed) { 
         tud_hid_n_keyboard_report(ITF_NUM_KEYBOARD, report_id, modifier, keycode);
-        key_pressed = false;
-        nothing_pressed = true;
+        send_keys_pressed = false;
+        send_keys_lifted = true;
       }
-      else if(nothing_pressed) {
+      else if(send_keys_lifted) {
         tud_hid_n_keyboard_report(ITF_NUM_KEYBOARD, report_id, 0, NULL);
-        nothing_pressed = false;
+        send_keys_lifted = false;
       }
     }
   }
